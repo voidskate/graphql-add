@@ -14,11 +14,6 @@ const someStyling = () => ({
 })
 
 const FishForm = () => {
-    const styles = someStyling();
-
-    const [id] = useState(uuidv4());
-    const [addFish] = useMutation(ADD_FISH);
-
     const [form] = Form.useForm();
     const [, forceUpdate] = useState();
 
@@ -26,28 +21,23 @@ const FishForm = () => {
         forceUpdate({})
     }, [])
 
+    const [addFish] = useMutation(ADD_FISH);
+    const styles = someStyling();
+
     const formSubmit = (values) => {
         const { firstName, lastName } = values;
-
+        const newId = uuidv4();
+      
         addFish({
             variables: {
-                id,
+                id: newId,
                 firstName,
-                lastName
+                lastName,
             },
-
-            update: (cache, { data: { addFish } }) => {
-                const data = cache.readQuery({ query: GET_FISHES })
-                cache.writeQuery({
-                    query: GET_FISHES,
-                    data: {
-                        ...data,
-                        allFishes: [...data.allFishes, addFish]
-                    }
-                })
-            }
-        })
+            refetchQueries: [{ query: GET_FISHES }],
+        });
     }
+      
 
     return(
         <Form
