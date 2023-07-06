@@ -34,7 +34,20 @@ const FishForm = () => {
                 firstName,
                 lastName,
             },
-            refetchQueries: [{ query: GET_FISHES }],
+
+            update: (cache, { data: { addFish } }) => {
+                const data = cache.readQuery({ query: GET_FISHES })
+                cache.writeQuery({
+                    query: GET_FISHES,
+                    data: {
+                        ...data,
+                        allFishes: [...data.allFishes, addFish]
+                    }
+                })
+            }
+
+            // NOTE: if the above "update" function doesn't work, use:
+            // refetchQueries: [{ query: GET_FISHES }]
         });
     }
       
